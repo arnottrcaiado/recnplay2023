@@ -70,21 +70,35 @@ class GerenciadorCores:
 
 gerenciador = GerenciadorCores()
 
-@app.route('/votar/<cor>', methods=['GET'])
+# endpoint para realizar votacao
+# https://recnplay2023.pythonanywhere.com/votar/"cor"
+# exemplo
+# https://recnplay2023.pythonanywhere.com/votar/vermelho
+#
+@app.route('/votar/<cor>', methods=['POST','GET'])
 def votar(cor):
     if gerenciador.incrementar_voto(cor):
         return jsonify({'mensagem': f'Voto registrado para a cor {cor}'}), 200
     else:
         return jsonify({'mensagem': 'Cor inválida'}), 400
 
+# endpoint para mostrar resultados gerais
+# https://recnplay2023.pythonanywhere.com/resultados
+#
 @app.route('/resultados', methods=['GET'])
 def obter_resultados():
     return jsonify(gerenciador.votos), 200
 
+# endpoint para mostrar ultimo voto
+# https://recnplay2023.pythonanywhere.com/ultima_escolha
+#
 @app.route('/ultima_escolha', methods=['GET'])
 def obter_ultima_escolha():
     return jsonify({'ultima_escolha': gerenciador.ultima_escolha}), 200
 
+# endpoint para mostrar todos os votos - lista
+# https://recnplay2023.pythonanywhere.com/registro_votos
+#
 @app.route('/registro_votos', methods=['GET'])
 def obter_registro_votos():
     return jsonify(gerenciador.obter_registro_votos()), 200
