@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rec N Play - Interações</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 50px;
+      background-color: #f7f7f7;
+    }
+
+    .container {
+      max-width: 450px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    input {
+      padding: 10px 0;
+      font-size: 16px;
+      width: 100%;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      text-align: center; /* Centralizando o texto dentro do campo */
+    }
+
+    .btn-container {
+      margin-bottom: 10px; /* Adiciona espaço abaixo dos botões */
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      border-radius: 4px;
+    }
+
+    /* Estilos para as cores dos botões */
+    .red {
+      background-color: red;
+    }
+
+    .blue {
+      background-color: blue;
+    }
+
+    .green {
+      background-color: green;
+    }
+
+     /* Estilos para os quadros de valores */
+    .value-box {
+      display: inline-block;
+      padding: 10px 10px;
+      font-size: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin: 0 2.5px;  /* Ajustando a margem para 2.5px, totalizando 5px entre quadros */
+      width: 20%;       /* Definindo uma largura fixa de 31% para cada quadro */
+      text-align: center;
+      color: white;
+    }
+
+
+    h1, p {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Rec N Play 23</h1>
+    <h1>Bem-vind@!</h1>
+    <p>Sua reação vira interação!</p>
+    <form action="/enviarCodigo" method="post">
+
+      <div class="btn-container">
+        <button class="button red" type="submit" formaction="/votar/vermelho">Vermelho</button>
+      </div>
+      <div class="btn-container">
+        <button class="button green" type="submit" formaction="/votar/verde">Verde</button>
+      </div>
+      <div class="btn-container">
+        <button class="button blue" type="submit" formaction="/votar/azul">Azul</button>
+      </div>
+
+      <!-- Quadros de Valores -->
+      <div class="btn-container">
+        <div class="value-box red">{{red}}</div>
+        <div class="value-box green">{{green}}</div>
+        <div class="value-box blue">{{blue}}</div>
+      </div>
+
+    </form>
+  </div>
+</body>
+</html>

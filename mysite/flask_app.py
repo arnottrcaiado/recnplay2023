@@ -5,7 +5,7 @@
 # Data: 6/10/2023
 # Autor: Arnott Ramos Caiado
 #
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, redirect
 import datetime
 import threading
 
@@ -70,6 +70,11 @@ class GerenciadorCores:
 
 gerenciador = GerenciadorCores()
 
+
+@app.route('/')
+def principal():
+    return render_template("index.html", red=gerenciador.votos['vermelho'], blue=gerenciador.votos['azul'], green=gerenciador.votos['verde'])
+
 # endpoint para realizar votacao
 # https://recnplay2023.pythonanywhere.com/votar/"cor"
 # exemplo
@@ -78,7 +83,8 @@ gerenciador = GerenciadorCores()
 @app.route('/votar/<cor>', methods=['POST','GET'])
 def votar(cor):
     if gerenciador.incrementar_voto(cor):
-        return jsonify({'mensagem': f'Voto registrado para a cor {cor}'}), 200
+        # return jsonify({'mensagem': f'Voto registrado para a cor {cor}'}), 200
+        return redirect('/')
     else:
         return jsonify({'mensagem': 'Cor inválida'}), 400
 
