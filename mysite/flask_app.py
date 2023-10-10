@@ -22,8 +22,7 @@ app = Flask(__name__)
 
 class GerenciadorCores:
     def __init__(self):
-        self.votos = {'vermelho': 0, 'azul': 0, 'verde': 0}
-        self.ultima_escolha = None
+        self.votos = {'vermelho': 0, 'azul': 0, 'verde': 0,'ultimo': None}
         self.registro_votos = []
         self.contagem_por_minuto = {'vermelho': 0, 'azul': 0, 'verde': 0}
 
@@ -33,7 +32,7 @@ class GerenciadorCores:
     def incrementar_voto(self, cor):
         if cor in self.votos:
             self.votos[cor] += 1
-            self.ultima_escolha = cor
+            self.votos['ultimo'] = cor
             momento_voto = datetime.datetime.now()
             self.registro_votos.append({'cor': cor, 'momento_voto': momento_voto})
             return True
@@ -41,6 +40,12 @@ class GerenciadorCores:
 
     def obter_registro_votos(self):
         return self.registro_votos
+
+    def obter_ultimo_voto(self):
+        return self.votos['ultimo']
+
+    def obter_votos(self):
+        return self.votos
 
     def calcular_votos_por_minuto(self):
         while True:
@@ -93,14 +98,14 @@ def votar(cor):
 #
 @app.route('/resultados', methods=['GET'])
 def obter_resultados():
-    return jsonify(gerenciador.votos), 200
+    return jsonify(gerenciador.obter_votos()), 200
 
 # endpoint para mostrar ultimo voto
 # https://recnplay2023.pythonanywhere.com/ultima_escolha
 #
 @app.route('/ultima_escolha', methods=['GET'])
 def obter_ultima_escolha():
-    return jsonify({'ultima_escolha': gerenciador.ultima_escolha}), 200
+    return jsonify({'ultima_escolha': gerenciador.obter_ultimo_voto()}), 200
 
 # endpoint para mostrar todos os votos - lista
 # https://recnplay2023.pythonanywhere.com/registro_votos
