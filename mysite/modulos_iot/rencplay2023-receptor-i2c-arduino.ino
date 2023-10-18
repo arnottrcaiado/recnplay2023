@@ -8,6 +8,54 @@
 // a definição de quais LEDs e Motores deve ser realizado nos HUBS com NodeMCU
 //
 
+/*
+send_to_master_begin():
+
+Esta função envia uma mensagem de início para o mestre.
+Usa a biblioteca Wire para iniciar uma transmissão I2C com o endereço 0x00 (endereço do mestre, ajustável conforme necessário).
+Envia o byte slaveCommand como comando do escravo ao mestre.
+
+wait_response_master():
+
+Aguarda até que um número específico de bytes (20 no caso) esteja disponível para leitura via I2C usando Wire.available().
+Essa função é usada para garantir que todas as informações do mestre sejam recebidas antes de prosseguir.
+
+get_response_master():
+
+Esta função coleta informações do mestre, que são enviadas como bytes por meio da comunicação I2C.
+Enquanto houver bytes disponíveis para leitura (Wire.available() >= 4) e o índice index for menor que o tamanho máximo MAX_MASTER_INFO, o código entra em um loop.
+Cada conjunto de 4 bytes lidos é interpretado como informações do mestre e armazenado na estrutura MasterInfo.
+Se o endereço lido for menor que 9, isso indica um servo motor, e a função também configura o servo correspondente usando a biblioteca Servo.
+As informações são então adicionadas à lista masterInfoList no índice index.
+
+setup_gpio_slave():
+
+Esta função inicializa os pinos GPIO como saídas com base nas informações armazenadas em masterInfoList.
+Percorre a lista masterInfoList e, para cada entrada, verifica se o endereço está acima de 9 (indicando um GPIO) e, se sim, configura o pino correspondente como saída usando pinMode().
+
+receiveEvent(int byteCount):
+
+Esta função é chamada automaticamente quando dados são recebidos do mestre por meio da comunicação I2C.
+Chama process_master_info() para processar os dados recebidos.
+
+process_master_info(byte* receivedByte):
+
+Esta função processa as informações recebidas do mestre.
+Usa Wire.readBytes() para ler os 14 bytes enviados pelo mestre.
+Converte os bytes em informações legíveis, como endereço, função, valores de ligar e desligar, tempos de ligar e desligar e tempo de espera.
+Imprime as informações recebidas na porta serial para fins de depuração.
+Atualiza as informações na lista masterInfoList procurando o endereço correspondente.
+
+update_gpio_slave():
+
+Esta função é responsável por atualizar os estados dos GPIOs e servos com base nas informações armazenadas em masterInfoList.
+Percorre a lista masterInfoList e, para cada entrada, verifica o estado do processo (st_process) e o tempo decorrido desde o último evento.
+Implementa a lógica para transições entre estados (ligar, desligar e aguardar) de acordo com os tempos especificados e as funções definidas pelo mestre.
+Controla servos usando a biblioteca Servo e controla GPIOs usando analogWrite().
+
+*/
+
+
 
 #include <Wire.h>
 #include <Servo.h>
@@ -52,7 +100,7 @@ MasterInfo masterInfoList[MAX_MASTER_INFO];
 
 void setup() {
   Serial.begin(9600);
-  
+
   Wire.begin(SLAVE_ADDRESS);
 
   // Envia para o master que este device foi ligado
@@ -114,7 +162,7 @@ void get_response_master() {
     data_received[1] = Wire.read();
     data_received[2] = Wire.read();
     data_received[3] = Wire.read();
-    
+
 
     // Leitura das informações do mestre
     info.address     = (data_received[0] << 8) | data_received[1];
@@ -137,7 +185,7 @@ void get_response_master() {
       servoList[n_servo].pos_servo = n_servo;
       n_servo++;
     }
-    
+
     // Adiciona as informações na lista
     masterInfoList[index] = info;
 
@@ -210,7 +258,7 @@ void process_master_info(byte* receivedByte) {
 void update_gpio_slave() {
   // Implementação para atualizar os GPIOs com base nas informações do mestre
   int index = 0;
-  
+
   for ( ; index < MAX_MASTER_INFO ; index++ )
   {
     // Change Iddle to On
@@ -235,7 +283,7 @@ void update_gpio_slave() {
         masterInfoList[index].timeProcess = millis();
       }
     }
-    
+
     // Change Off to On
     if (masterInfoList[index].st_process == 1 and masterInfoList[index].timeProcess - millis() > masterInfoList[index].timeOff)
     {
@@ -280,7 +328,7 @@ void update_gpio_slave() {
         masterInfoList[index].timeProcess = millis();
       }
     }
-    
+
   }
-  
+
 }
