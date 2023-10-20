@@ -5,7 +5,7 @@
 # Data: 6/10/2023
 # Autor: Arnott Ramos Caiado
 #
-from flask import Flask, request, jsonify, render_template, redirect
+from flask import Flask, jsonify, render_template, redirect
 import datetime
 import threading
 
@@ -24,7 +24,7 @@ class GerenciadorCores:
     def __init__(self):
         self.votos = {'vermelho': 0, 'azul': 0, 'verde': 0,'ultimo': None, 'ledgrande': True}
         self.registro_votos = []
-        self.contagem_por_minuto = {'vermelho': 0, 'azul': 0, 'verde': 0}
+        self.contagem_por_minuto = {'vermelho': 0, 'azul': 0, 'verde': 0, 'ledgrande': True}
 
         # Inicia um cronômetro para calcular os votos por minuto
         self.iniciar_cronometro()
@@ -68,11 +68,10 @@ class GerenciadorCores:
             threading.Event().wait(60)
 
     def mudarEstadoLed(self) :
-        if self.ledgrande == True :
-            self.ledgrande = False
+        if self.votos['ledgrande'] == True :
+            self.votos['ledgrande'] = False
         else :
-            self.ledgrande = True
-
+            self.votos['ledgrande'] = True
 
     def iniciar_cronometro(self):
         # Inicia uma thread para calcular os votos por minuto
