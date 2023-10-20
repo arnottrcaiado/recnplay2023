@@ -13,7 +13,7 @@
       background-color: #f7f7f7;
     }
 
-    .container {
+  .container {
       max-width: 450px;
       margin: 0 auto;
       padding: 20px;
@@ -21,6 +21,15 @@
       border-radius: 8px;
       background-color: #fff;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background-image: url("/static/images/card-desfile.jpeg");
+      background-repeat: no-repeat;
+      background-size: cover; /* Para ajustar a imagem ao tamanho do contêiner */
+    }
+
+
+    img {
+      max-width: 100%; /* A imagem se ajustará ao tamanho do container pai */
+      height: auto; /* Mantém a proporção da imagem */
     }
 
     input {
@@ -61,6 +70,10 @@
       background-color: green;
     }
 
+    .led {
+      background-color: yellow :
+    }
+
      /* Estilos para os quadros de valores */
     .value-box {
       display: inline-block;
@@ -82,9 +95,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>Rec N Play 23</h1>
-    <h1>Bem-vind@!</h1>
-    <p>Sua reação vira interação!</p>
+    <h1>Sua reação vira interação!</h1>
     <form action="/enviarCodigo" method="post">
 
       <div class="btn-container">
@@ -95,6 +106,9 @@
       </div>
       <div class="btn-container">
         <button class="button blue" type="submit" formaction="/votar/azul">Azul</button>
+      </div>
+      <div class="btn-container">
+        <button class="button led" type="submit" formaction="/ledgrande">Uau</button>
       </div>
 
       <!-- Quadros de Valores -->

@@ -22,7 +22,7 @@ app = Flask(__name__)
 
 class GerenciadorCores:
     def __init__(self):
-        self.votos = {'vermelho': 0, 'azul': 0, 'verde': 0,'ultimo': None}
+        self.votos = {'vermelho': 0, 'azul': 0, 'verde': 0,'ultimo': None, 'ledgrande': True}
         self.registro_votos = []
         self.contagem_por_minuto = {'vermelho': 0, 'azul': 0, 'verde': 0}
 
@@ -67,6 +67,13 @@ class GerenciadorCores:
             # Aguarde 1 minuto antes de verificar novamente
             threading.Event().wait(60)
 
+    def mudarEstadoLed(self) :
+        if self.ledgrande == True :
+            self.ledgrande = False
+        else :
+            self.ledgrande = True
+
+
     def iniciar_cronometro(self):
         # Inicia uma thread para calcular os votos por minuto
         cronometro_thread = threading.Thread(target=self.calcular_votos_por_minuto)
@@ -92,6 +99,11 @@ def votar(cor):
         return redirect('/')
     else:
         return jsonify({'mensagem': 'Cor inválida'}), 400
+
+@app.route('/ledgrande', methods=['POST', 'GET'])
+def ledGrande():
+    gerenciador.mudarEstadoLed()
+    return redirect('/')
 
 # endpoint para mostrar resultados gerais
 # https://recnplay2023.pythonanywhere.com/resultados
