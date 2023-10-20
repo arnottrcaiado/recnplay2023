@@ -7,7 +7,6 @@
 #
 from flask import Flask, jsonify, render_template, redirect
 import datetime
-import threading
 
 import os
 import time
@@ -24,10 +23,6 @@ class GerenciadorCores:
     def __init__(self):
         self.votos = {'vermelho': 0, 'azul': 0, 'verde': 0,'ultimo': None, 'ledgrande': True}
         self.registro_votos = []
-        self.contagem_por_minuto = {'vermelho': 0, 'azul': 0, 'verde': 0, 'ledgrande': True}
-
-        # Inicia um cronômetro para calcular os votos por minuto
-        self.iniciar_cronometro()
 
     def incrementar_voto(self, cor):
         if cor in self.votos:
@@ -47,40 +42,14 @@ class GerenciadorCores:
     def obter_votos(self):
         return self.votos
 
-    def calcular_votos_por_minuto(self):
-        while True:
-            # Obtém o momento atual
-            momento_atual = datetime.datetime.now()
-
-            # Inicializa a contagem por minuto
-            contagem_por_minuto = {'vermelho': 0, 'azul': 0, 'verde': 0}
-
-            # Calcula a contagem por minuto com base nos votos no último minuto
-            for voto in self.registro_votos:
-                diferenca_tempo = momento_atual - voto['momento_voto']
-                if diferenca_tempo.total_seconds() <= 60:
-                    contagem_por_minuto[voto['cor']] += 1
-
-            # Atualiza a contagem por minuto
-            self.contagem_por_minuto = contagem_por_minuto
-
-            # Aguarde 1 minuto antes de verificar novamente
-            threading.Event().wait(60)
-
     def mudarEstadoLed(self) :
         if self.votos['ledgrande'] == True :
             self.votos['ledgrande'] = False
         else :
             self.votos['ledgrande'] = True
 
-    def iniciar_cronometro(self):
-        # Inicia uma thread para calcular os votos por minuto
-        cronometro_thread = threading.Thread(target=self.calcular_votos_por_minuto)
-        cronometro_thread.daemon = True
-        cronometro_thread.start()
 
 gerenciador = GerenciadorCores()
-
 
 @app.route('/')
 def principal():
@@ -91,31 +60,44 @@ def principal():
 # exemplo
 # https://recnplay2023.pythonanywhere.com/votar/vermelho
 #
-@app.route('/votar/<cor>', methods=['POST','GET'])
-def votar(cor):
-    if gerenciador.incrementar_voto(cor):
-        # return jsonify({'mensagem': f'Voto registrado para a cor {cor}'}), 200
-        return redirect('/')
-    else:
-        return jsonify({'mensagem': 'Cor inválida'}), 400
+#@app.route('/votar/<cor>', methods=['POST','GET'])
+#def votar(cor):
+#    if gerenciador.incrementar_voto(cor):
+##        # return jsonify({'mensagem': f'Voto registrado para a cor {cor}'}), 200
+#        return redirect('/')
+#    else:
+#        return jsonify({'mensagem': 'Cor inválida'}), 400
 
-@app.route('/ledgrande', methods=['POST', 'GET'])
-def ledGrande():
-    gerenciador.mudarEstadoLed()
-    return redirect('/')
+@app.route('/votar/<cor>', methods=['POST'])
+def votar(cor):
+    global gerenciador
+    if cor in ['vermelho', 'azul', 'verde']:
+        if gerenciador.incrementar_voto(cor):
+            return redirect('/')
+    return jsonify({'mensagem': 'Cor inválida'}), 400
+
+
 
 # endpoint para mostrar resultados gerais
 # https://recnplay2023.pythonanywhere.com/resultados
 #
 @app.route('/resultados', methods=['GET'])
 def obter_resultados():
+    global gerenciador
     return jsonify(gerenciador.obter_votos()), 200
+
+@app.route('/ledgrande', methods=['POST', 'GET'])
+def ledGrande():
+    global gerenciador
+    gerenciador.mudarEstadoLed()
+    return redirect('/')
 
 # endpoint para mostrar ultimo voto
 # https://recnplay2023.pythonanywhere.com/ultima_escolha
 #
 @app.route('/ultima_escolha', methods=['GET'])
 def obter_ultima_escolha():
+    global gerenciador
     return jsonify({'ultima_escolha': gerenciador.obter_ultimo_voto()}), 200
 
 # endpoint para mostrar todos os votos - lista
@@ -123,11 +105,9 @@ def obter_ultima_escolha():
 #
 @app.route('/registro_votos', methods=['GET'])
 def obter_registro_votos():
+    global gerenciador
     return jsonify(gerenciador.obter_registro_votos()), 200
 
-@app.route('/votos_por_minuto', methods=['GET'])
-def obter_votos_por_minuto():
-    return jsonify(gerenciador.contagem_por_minuto), 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
