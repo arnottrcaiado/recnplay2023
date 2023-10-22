@@ -8,6 +8,5 @@ os.environ['TERM'] = 'xterm-256color'
 os.environ['PYTHONSTARTUP'] = '/home/recnplay2023/.pythonstartup.py'
 os.environ['PYTHONANYWHERE_DOMAIN'] = 'pythonanywhere.com'
 os.environ['PYTHONANYWHERE_SITE'] = 'www.pythonanywhere.com'
-os.environ['http_proxy'] = 'http://proxy.server:3128'
-os.environ['https_proxy'] = 'http://proxy.server:3128'
-os.environ['no_proxy'] = 'localhost,127.0.0.1,localaddress,.localdomain.com,/var/run/docker.sock'
+os.environ.pop("http_proxy", None)
+os.environ.pop("https_proxy", None)
